@@ -23,6 +23,7 @@ public class Plugin : BaseUnityPlugin
         // Patch all method overrides
         Harmony.CreateAndPatchAll(typeof(RhythmControllerPatch));
         Harmony.CreateAndPatchAll(typeof(RhythmBaseCharacter_Mute_Patch));
+        Harmony.CreateAndPatchAll(typeof(RhythmPlayer_Mute_Patch));
 
         Harmony.CreateAndPatchAll(typeof(DefaultNotePatch));
         Harmony.CreateAndPatchAll(typeof(DodgeNotePatch));
