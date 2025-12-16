@@ -1,4 +1,4 @@
 using HarmonyLib;
 using Rhythm;
 
-namespace AutoTimedHitsounds;
+namespace AutoTimedHitsounds.Patches;

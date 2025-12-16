@@ -1,4 +1,5 @@
-﻿using BepInEx;
+﻿using AutoTimedHitsounds.Patches;
+using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 
@@ -17,6 +18,7 @@ public class Plugin : BaseUnityPlugin
 
         // Patch all method overrides
         Harmony.CreateAndPatchAll(typeof(RhythmControllerPatch));
+        Harmony.CreateAndPatchAll(typeof(RhythmBaseCharacter_Mute_Patch));
 
         Logger.LogInfo($"Plugin {PluginReleaseInfo.PLUGIN_GUID} is loaded!");
     }
