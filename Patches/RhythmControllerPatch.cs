@@ -6,6 +6,17 @@ namespace AutoTimedHitsounds.Patches;
 
 class RhythmControllerPatch
 {
+    [HarmonyPatch(typeof(RhythmController), nameof(RhythmController.InitializeAndPlay))]
+    [HarmonyPostfix]
+    static void InitializeAndPlay(RhythmController __instance)
+    {
+        // Cache the song EventInstance to get accurate timing straight from the source
+        // Good to cache this because we need to use Traverse to access the private property on RhythmTracker
+        Traverse tracker = Traverse.Create(__instance.songTracker);
+        HitsoundManager.SongInstance = tracker.Field("instance").GetValue<EventInstance>();
+    }
+
+
     [HarmonyPatch(typeof(RhythmController), "OnDestroy")]
     [HarmonyPrefix]
     static bool OnDestroy()

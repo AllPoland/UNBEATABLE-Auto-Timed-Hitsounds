@@ -2,22 +2,23 @@ using FMOD;
 using FMOD.Studio;
 using FMODUnity;
 using Rhythm;
-using UnityEngine;
 
 namespace AutoTimedHitsounds;
 
 public static class FMODHelper
 {
-    public static ScheduledNote ScheduleSound(BaseNote note, EventReference sfx, float songTime, float hitsoundTime)
+    public static ScheduledNote ScheduleSound(BaseNote note, EventReference sfx, ulong songSamples, ulong hitsoundSamples, byte id)
     {
-        float delaySeconds = hitsoundTime - songTime;
+        ulong delaySamples = hitsoundSamples - songSamples;
+        // Plugin.Logger.LogInfo($"song samples: {songSamples}, hitsound samples: {hitsoundSamples}, delay: {delaySamples}");
 
         EventInstance newEvent = RuntimeManager.CreateInstance(sfx);
         return new ScheduledNote
         {
             note = note,
             sound = newEvent,
-            delaySeconds = delaySeconds
+            delaySamples = delaySamples,
+            id = id
         };
     }
 
@@ -31,10 +32,9 @@ public static class FMODHelper
             return false;
         }
 
-        ulong delaySamples = (ulong)(note.delaySeconds * AudioSettings.GetSampleRate());
         channelGroup.getDSPClock(out ulong dspClock, out ulong parentClock);
 
-        channelGroup.setDelay(parentClock + delaySamples, 0, true);
+        channelGroup.setDelay(parentClock + note.delaySamples, 0, true);
         note.sound.start();
 
         // release() marks the event for cleanup *after* it has played to completion

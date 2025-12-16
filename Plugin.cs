@@ -10,6 +10,10 @@ namespace AutoTimedHitsounds;
 public class Plugin : BaseUnityPlugin
 {
     internal static new ManualLogSource Logger;
+
+    public static float MaxScheduleOffset = 200f;
+    public static float MinScheduleOffset = 10f;
+
         
     private void Awake()
     {
