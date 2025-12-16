@@ -21,6 +21,10 @@ public class Plugin : BaseUnityPlugin
         Harmony.CreateAndPatchAll(typeof(RhythmBaseCharacter_Mute_Patch));
 
         Harmony.CreateAndPatchAll(typeof(DefaultNotePatch));
+        Harmony.CreateAndPatchAll(typeof(DodgeNotePatch));
+        Harmony.CreateAndPatchAll(typeof(DoubleNotePatch));
+        Harmony.CreateAndPatchAll(typeof(FreestyleNotePatch));
+        Harmony.CreateAndPatchAll(typeof(SpamNotePatch));
 
         Logger.LogInfo($"Plugin {PluginReleaseInfo.PLUGIN_GUID} is loaded!");
     }

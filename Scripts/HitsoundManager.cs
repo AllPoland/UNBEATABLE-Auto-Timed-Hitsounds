@@ -12,16 +12,24 @@ public static class HitsoundManager
     public static List<ScheduledNote> ScheduledNotes = new List<ScheduledNote>();
 
 
-    public static void ScheduleNote(BaseNote note, EventReference sfx)
+    public static void ScheduleNote(BaseNote note, EventReference sfx, float noteTime)
     {
         // Note and song time are stored in milliseconds
-        float noteTime = note.hitTimeFirst / 1000f;
+        noteTime /= 1000f;
         float songTime = note.songPosition / 1000f;
 
         // Plugin.Logger.LogInfo($"note time: {noteTime}, song time: {songTime}");
         ScheduledNote newNote = FMODHelper.ScheduleSound(note, sfx, songTime, noteTime);
 
         ScheduledNotes.Add(newNote);
+    }
+
+
+    public static void ScheduleNote(BaseNote note, EventReference sfx)
+    {
+        // Note and song time are stored in milliseconds
+        float noteTime = note.hitTime;
+        ScheduleNote(note, sfx, noteTime);
     }
 
 
