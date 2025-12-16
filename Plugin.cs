@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
+using HarmonyLib;
 
 namespace AutoTimedHitsounds;
 
@@ -13,6 +14,10 @@ public class Plugin : BaseUnityPlugin
     {
         // Plugin startup logic
         Logger = base.Logger;
+
+        // Patch all method overrides
+        Harmony.CreateAndPatchAll(typeof(RhythmControllerPatch));
+
         Logger.LogInfo($"Plugin {PluginReleaseInfo.PLUGIN_GUID} is loaded!");
     }
 }
