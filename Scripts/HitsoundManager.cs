@@ -155,7 +155,7 @@ public static class HitsoundManager
 
     public static void DisposeOldSounds()
     {
-        const float MinTimeOffsetToDispose = 300f;
+        const float MinTimeOffsetToDispose = 500f;
         RESULT result = SongInstance.getTimelinePosition(out int songPosition);
         if(result != RESULT.OK)
         {

@@ -69,19 +69,7 @@ class RhythmController_Mute_Patch
     {
         // Same behavior as the original method, just without hitsound
         // This is far from ideal, but reflection is being poopy and won't let me transpile
-        Height opposite;
-        switch(height)
-        {
-            case Height.Low:
-                opposite = Height.Top;
-                break;
-            case Height.Top:
-                opposite = Height.Low;
-                break;
-            default:
-                opposite = Height.None;
-                break;
-        }
+        Height opposite = HeightUtil.OppositeHeight(height);
         __instance.player.alreadyHitHeights.Add(opposite);
         __instance.TutorialResume();
 

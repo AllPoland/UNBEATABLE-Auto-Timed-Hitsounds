@@ -1,3 +1,4 @@
+using FMODUnity;
 using HarmonyLib;
 using Rhythm;
 
@@ -12,7 +13,9 @@ public class DefaultNotePatch
         // Schedule the hitsound if necessary
         if(HitsoundManager.ShouldNoteSchedule(__instance))
         {
-            HitsoundManager.ScheduleNote(__instance, __instance.controller.hitSFX);
+            bool useAssistSound = HitsoundUtil.UseAssistSound(__instance, __instance.height, __instance.hitTime);
+            EventReference sfx = useAssistSound ? __instance.controller.hitAssistSFX : __instance.controller.hitSFX;
+            HitsoundManager.ScheduleNote(__instance, sfx);
         }
 
         // Perform the original method
