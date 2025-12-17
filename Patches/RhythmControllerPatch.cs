@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using HarmonyLib;
 using FMOD.Studio;
 using Rhythm;
@@ -21,13 +22,20 @@ class RhythmControllerPatch
     [HarmonyPrefix]
     static bool OnDestroyPrefix()
     {
-        // Clear our scheduled hitsound list so we don't memory leak all over the place
-        HitsoundManager.ScheduledNotes.Clear();
-        foreach(ScheduledNote note in HitsoundManager.PlayedNotes)
+        // Clear our hitsound state so we don't memory leak all over the place
+        HitsoundManager.ScheduledSounds.Clear();
+        foreach(KeyValuePair<ScheduledNote, ScheduledSound> pair in HitsoundManager.PlayedSounds)
         {
-            note.sound.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+            pair.Value.sound.stop(STOP_MODE.IMMEDIATE);
         }
-        HitsoundManager.PlayedNotes.Clear();
+        HitsoundManager.PlayedSounds.Clear();
+
+        HitsoundManager.ScheduledHolds.Clear();
+        foreach(KeyValuePair<BaseNote, ScheduledHold> pair in HitsoundManager.PlayedHolds)
+        {
+            pair.Value.sound.stop(STOP_MODE.IMMEDIATE);
+        }
+        HitsoundManager.PlayedHolds.Clear();
         return true;
     }
 
@@ -36,9 +44,10 @@ class RhythmControllerPatch
     [HarmonyPrefix]
     static bool FixedUpdatePrefix()
     {
-        // Update scheduled hitsounds to see if they're initialized now
-        HitsoundManager.UpdateScheduledNotes();
+        // HitsoundManager piggybacks off of FixedUpdate as long as RhythmController is active
+        HitsoundManager.UpdateScheduledSounds();
         HitsoundManager.UpdateScheduledHolds();
+        HitsoundManager.DisposeOldSounds();
         return true;
     }
 }

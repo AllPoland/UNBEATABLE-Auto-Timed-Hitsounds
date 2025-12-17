@@ -1,29 +1,26 @@
 using FMOD;
 using FMOD.Studio;
 using FMODUnity;
-using Rhythm;
 
 namespace AutoTimedHitsounds;
 
 public static class FMODHelper
 {
-    public static ScheduledNote ScheduleSound(BaseNote note, EventReference sfx, ulong songSamples, ulong hitsoundSamples, byte id)
+    public static ScheduledSound ScheduleSound(EventReference sfx, ulong songSamples, ulong hitsoundSamples)
     {
         ulong delaySamples = hitsoundSamples - songSamples;
         // Plugin.Logger.LogInfo($"song samples: {songSamples}, hitsound samples: {hitsoundSamples}, delay: {delaySamples}");
 
         EventInstance newEvent = RuntimeManager.CreateInstance(sfx);
-        return new ScheduledNote
+        return new ScheduledSound
         {
-            note = note,
             sound = newEvent,
-            delaySamples = delaySamples,
-            id = id
+            delaySamples = delaySamples
         };
     }
 
 
-    public static ScheduledHold ScheduleHold(HoldNote note, EventReference sfx, ulong songSamples, ulong startSamples, ulong endSamples)
+    public static ScheduledHold ScheduleHold(EventReference sfx, ulong songSamples, ulong startSamples, ulong endSamples)
     {
         ulong delaySamples = startSamples - songSamples;
         ulong endDelaySamples = endSamples - songSamples;
@@ -31,7 +28,6 @@ public static class FMODHelper
         EventInstance newEvent = RuntimeManager.CreateInstance(sfx);
         return new ScheduledHold
         {
-            note = note,
             sound = newEvent,
             delaySamples = delaySamples,
             endDelaySamples = endDelaySamples
@@ -39,9 +35,9 @@ public static class FMODHelper
     }
 
 
-    public static bool TryPlaySound(ScheduledNote note)
+    public static bool TryPlaySound(ScheduledSound sound)
     {
-        RESULT channelGroupStatus = note.sound.getChannelGroup(out ChannelGroup channelGroup);
+        RESULT channelGroupStatus = sound.sound.getChannelGroup(out ChannelGroup channelGroup);
         if(channelGroupStatus != RESULT.OK)
         {
             // We need to wait a few frames before we can grab the channel group
@@ -50,11 +46,11 @@ public static class FMODHelper
 
         channelGroup.getDSPClock(out ulong dspClock, out ulong parentClock);
 
-        channelGroup.setDelay(parentClock + note.delaySamples, 0, true);
-        note.sound.start();
+        channelGroup.setDelay(parentClock + sound.delaySamples, 0, true);
+        sound.sound.start();
 
         // release() marks the event for cleanup *after* it has played to completion
-        note.sound.release();
+        sound.sound.release();
 
         // Plugin.Logger.LogInfo($"delay seconds: {note.delaySeconds}, delay samples: {delaySamples}, dsp clock: {parentClock}");
         return true;
