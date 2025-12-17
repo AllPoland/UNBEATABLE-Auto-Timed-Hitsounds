@@ -16,8 +16,7 @@ public static class HitsoundManager
     public static Dictionary<BaseNote, ScheduledHold> ScheduledHolds = new Dictionary<BaseNote, ScheduledHold>();
 
     public static EventInstance SongInstance;
-
-    private const float minSongPositionToSchedule = 100f;
+    public static float CountdownLength;
 
 
     public static void ScheduleNote(BaseNote note, EventReference sfx, float noteTime, float endTime, byte id = 0)
@@ -29,10 +28,10 @@ public static class HitsoundManager
             return;
         }
 
-        if(songPosition < minSongPositionToSchedule)
+        if(note.controller.enableCountdown && songPosition <= 0f)
         {
-            // Give song position a moment to settle down before trying to schedule
-            return;
+            // We're in the countdown time, so we need to use the countdown position instead
+            songPosition = (int)(note.controller.songTracker.CountdownPosition - CountdownLength);
         }
 
         float noteOffset = noteTime - songPosition;
@@ -70,10 +69,10 @@ public static class HitsoundManager
             return;
         }
 
-        if(songPosition < minSongPositionToSchedule)
+        if(note.controller.enableCountdown && songPosition <= 0f)
         {
-            // Give song position a moment to settle down before trying to schedule
-            return;
+            // We're in the countdown time, so we need to use the countdown position instead
+            songPosition = (int)(note.controller.songTracker.CountdownPosition - CountdownLength);
         }
 
         float startTime = note.hitTime;
@@ -85,8 +84,6 @@ public static class HitsoundManager
         }
 
         float endTime = note.endTime;
-
-        Plugin.Logger.LogInfo($"Scheduled hold, song time {songPosition}, start time {startTime}, end time {endTime}");
 
         int sampleRate = AudioSettings.GetSampleRate();
         ulong songSamples = (ulong)(songPosition / 1000f * sampleRate);

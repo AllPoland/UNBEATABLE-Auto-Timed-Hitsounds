@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using HarmonyLib;
 using FMOD.Studio;
 using Rhythm;
+using System.Linq;
 
 namespace AutoTimedHitsounds.Patches;
 
@@ -15,6 +16,14 @@ class RhythmControllerPatch
         // Good to cache this because we need to use Traverse to access the private property on RhythmTracker
         Traverse tracker = Traverse.Create(__instance.songTracker);
         HitsoundManager.SongInstance = tracker.Field("instance").GetValue<EventInstance>();
+
+        if(__instance.enableCountdown)
+        {
+            // Save the countdown length so that we can calculate negative time values
+            // This is necessary in order to schedule notes placed within the first few ms of the map (or at 0ms)
+            TimingPointInfo timingPointInfo = __instance.beatmap.timingPoints.FirstOrDefault(x => x.beatLength > 0f);
+            HitsoundManager.CountdownLength = 750f + 8f * timingPointInfo.beatLength;
+        }
     }
 
 
