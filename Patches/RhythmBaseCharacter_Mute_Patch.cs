@@ -8,13 +8,13 @@ using Rhythm;
 
 namespace AutoTimedHitsounds.Patches;
 
-[HarmonyPatch(typeof(RhythmBaseCharacter))]
-[HarmonyPatch(nameof(RhythmBaseCharacter.Hold))]
 class RhythmBaseCharacter_Mute_Patch
 {
-    static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+    [HarmonyPatch(typeof(RhythmBaseCharacter), nameof(RhythmBaseCharacter.Hold))]
+    [HarmonyTranspiler]
+    static IEnumerable<CodeInstruction> HoldTranspiler(IEnumerable<CodeInstruction> instructions, MethodBase original)
     {
-        List<CodeInstruction> codes = new List<CodeInstruction>(instructions);
+        List<CodeInstruction> codes = instructions.ToList();
         for(int i = 0; i < codes.Count; i++)
         {
             // Search for the opcode that calls for EventInstance to play the hold hitsound
@@ -28,11 +28,12 @@ class RhythmBaseCharacter_Mute_Patch
             if(codes[i].Calls(targetMethod))
             {
                 // Bye bye hitsound :D
-                Plugin.Logger.LogInfo($"Removing instruction: RhythmBaseCharacter.Hold[{i}]");
+                Plugin.Logger.LogInfo($"Removing instruction: {original.DeclaringType}.{original.Name}[{i}]");
                 codes[i].opcode = OpCodes.Nop;
             }
         }
 
+        Plugin.Logger.LogInfo($"Done patching {original.DeclaringType}.{original.Name}()");
         return codes.AsEnumerable();
     }
 }

@@ -4,12 +4,11 @@ using Rhythm;
 
 namespace AutoTimedHitsounds.Patches;
 
-
 public class SpamNotePatch
 {
     [HarmonyPatch(typeof(SpamNote), "RhythmUpdate_Moving")]
     [HarmonyPrefix]
-    static bool RhythmUpdate_Moving(SpamNote __instance)
+    static bool RhythmUpdate_MovingPrefix(SpamNote __instance)
     {
         // Schedule the hitsound if necessary
         if(HitsoundManager.ShouldNoteSchedule(__instance))
@@ -24,7 +23,7 @@ public class SpamNotePatch
 
     [HarmonyPatch(typeof(SpamNote), "RhythmUpdate_Stunned")]
     [HarmonyPrefix]
-    static bool RhythmUpdate_Stunned(SpamNote __instance)
+    static bool RhythmUpdate_StunnedPrefix(SpamNote __instance)
     {
         //Also play hitsounds for button presses during the spam period
         if(__instance.IsSwungAt())

@@ -3,12 +3,11 @@ using Rhythm;
 
 namespace AutoTimedHitsounds.Patches;
 
-
 public class DefaultNotePatch
 {
     [HarmonyPatch(typeof(DefaultNote), "RhythmUpdate_Moving")]
     [HarmonyPrefix]
-    static bool RhythmUpdate_Moving(DefaultNote __instance)
+    static bool RhythmUpdate_MovingPrefix(DefaultNote __instance)
     {
         // Schedule the hitsound if necessary
         if(HitsoundManager.ShouldNoteSchedule(__instance))
