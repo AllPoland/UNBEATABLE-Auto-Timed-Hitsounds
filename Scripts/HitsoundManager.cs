@@ -9,21 +9,29 @@ namespace AutoTimedHitsounds;
 
 public static class HitsoundManager
 {
-    public static Dictionary<ScheduledNote, ScheduledSound> PlayedSounds = new Dictionary<ScheduledNote, ScheduledSound>();
-    public static Dictionary<ScheduledNote, ScheduledSound> ScheduledSounds = new Dictionary<ScheduledNote, ScheduledSound>();
+    public static Dictionary<BaseNote, ScheduledSound>[] PlayedSounds = [[],[]];
+    public static Dictionary<BaseNote, ScheduledSound>[] ScheduledSounds = [[],[]];
 
     public static Dictionary<BaseNote, ScheduledHold> PlayedHolds = new Dictionary<BaseNote, ScheduledHold>();
     public static Dictionary<BaseNote, ScheduledHold> ScheduledHolds = new Dictionary<BaseNote, ScheduledHold>();
 
     public static EventInstance SongInstance;
 
+    private const float minSongPositionToSchedule = 100f;
 
-    public static void ScheduleNote(BaseNote note, EventReference sfx, float noteTime, byte id = 0)
+
+    public static void ScheduleNote(BaseNote note, EventReference sfx, float noteTime, float endTime, byte id = 0)
     {
         RESULT result = SongInstance.getTimelinePosition(out int songPosition);
         if(result != RESULT.OK)
         {
             Plugin.Logger.LogWarning($"Failed to get song position: {result}");
+            return;
+        }
+
+        if(songPosition < minSongPositionToSchedule)
+        {
+            // Give song position a moment to settle down before trying to schedule
             return;
         }
 
@@ -39,14 +47,9 @@ public static class HitsoundManager
         ulong noteSamples = (ulong)(noteTime / 1000f * sampleRate);
 
         ScheduledSound newSound = FMODHelper.ScheduleSound(sfx, songSamples, noteSamples);
-        newSound.time = noteTime;
+        newSound.endTime = endTime;
 
-        ScheduledNote newNote = new ScheduledNote
-        {
-            note = note,
-            id = id
-        };
-        ScheduledSounds.Add(newNote, newSound);
+        ScheduledSounds[id].Add(note, newSound);
     }
 
 
@@ -54,7 +57,7 @@ public static class HitsoundManager
     {
         // Note and song time are stored in milliseconds
         float noteTime = note.hitTime;
-        ScheduleNote(note, sfx, noteTime, id);
+        ScheduleNote(note, sfx, noteTime, noteTime, id);
     }
 
 
@@ -67,6 +70,12 @@ public static class HitsoundManager
             return;
         }
 
+        if(songPosition < minSongPositionToSchedule)
+        {
+            // Give song position a moment to settle down before trying to schedule
+            return;
+        }
+
         float startTime = note.hitTime;
         float noteOffset = startTime - songPosition;
         if(noteOffset > Plugin.MaxScheduleOffset)
@@ -76,6 +85,8 @@ public static class HitsoundManager
         }
 
         float endTime = note.endTime;
+
+        Plugin.Logger.LogInfo($"Scheduled hold, song time {songPosition}, start time {startTime}, end time {endTime}");
 
         int sampleRate = AudioSettings.GetSampleRate();
         ulong songSamples = (ulong)(songPosition / 1000f * sampleRate);
@@ -91,13 +102,8 @@ public static class HitsoundManager
 
     public static bool ShouldNoteSchedule(BaseNote note, byte id = 0)
     {
-        ScheduledNote key = new ScheduledNote
-        {
-            note = note,
-            id = id
-        };
 
-        return !ScheduledSounds.ContainsKey(key) && !PlayedSounds.ContainsKey(key);
+        return !ScheduledSounds[id].ContainsKey(note) && !PlayedSounds[id].ContainsKey(note);
     }
 
 
@@ -109,20 +115,23 @@ public static class HitsoundManager
 
     public static void UpdateScheduledSounds()
     {
-        List<ScheduledNote> finishedNotes = new List<ScheduledNote>();
-        foreach(KeyValuePair<ScheduledNote, ScheduledSound> pair in ScheduledSounds)
+        for(byte id = 0; id < ScheduledSounds.Length; id++)
         {
-            if(FMODHelper.TryPlaySound(pair.Value))
+            List<BaseNote> finishedNotes = new List<BaseNote>();
+            foreach(KeyValuePair<BaseNote, ScheduledSound> pair in ScheduledSounds[id])
             {
-                // This sound is now good to go
-                PlayedSounds.Add(pair.Key, pair.Value);
-                finishedNotes.Add(pair.Key);
+                if(FMODHelper.TryPlaySound(pair.Value))
+                {
+                    // This sound is now good to go
+                    PlayedSounds[id].Add(pair.Key, pair.Value);
+                    finishedNotes.Add(pair.Key);
+                }
             }
-        }
 
-        foreach(ScheduledNote note in finishedNotes)
-        {
-            ScheduledSounds.Remove(note);
+            foreach(BaseNote note in finishedNotes)
+            {
+                ScheduledSounds[id].Remove(note);
+            }
         }
     }
 
@@ -157,20 +166,23 @@ public static class HitsoundManager
             return;
         }
 
-        List<ScheduledNote> notesToDispose = new List<ScheduledNote>();
-        foreach(KeyValuePair<ScheduledNote, ScheduledSound> pair in PlayedSounds)
+        for(byte id = 0; id < PlayedSounds.Length; id++)
         {
-            float noteTime = pair.Value.time;
-            float timeOffset = songPosition - noteTime;
-            if(timeOffset >= MinTimeOffsetToDispose)
+            List<BaseNote> notesToDispose = new List<BaseNote>();
+            foreach(KeyValuePair<BaseNote, ScheduledSound> pair in PlayedSounds[id])
             {
-                notesToDispose.Add(pair.Key);
+                float noteTime = pair.Value.endTime;
+                float timeOffset = songPosition - noteTime;
+                if(timeOffset >= MinTimeOffsetToDispose)
+                {
+                    notesToDispose.Add(pair.Key);
+                }
             }
-        }
 
-        foreach(ScheduledNote note in notesToDispose)
-        {
-            UnregisterNote(note.note, note.id);
+            foreach(BaseNote note in notesToDispose)
+            {
+                UnregisterNote(note, id);
+            }
         }
 
         List<BaseNote> holdsToDispose = new List<BaseNote>();
@@ -193,17 +205,11 @@ public static class HitsoundManager
 
     public static void UnregisterNote(BaseNote note, byte id)
     {
-        ScheduledNote key = new ScheduledNote
+        ScheduledSounds[id].Remove(note);
+        if(PlayedSounds[id].ContainsKey(note))
         {
-            note = note,
-            id = id
-        };
-
-        ScheduledSounds.Remove(key);
-        if(PlayedSounds.ContainsKey(key))
-        {
-            PlayedSounds[key].sound.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
-            PlayedSounds.Remove(key);
+            PlayedSounds[id][note].sound.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+            PlayedSounds[id].Remove(note);
         }
     }
 
@@ -220,17 +226,10 @@ public static class HitsoundManager
 }
 
 
-public struct ScheduledNote
-{
-    public BaseNote note;
-    public byte id;
-}
-
-
 public struct ScheduledSound
 {
     public EventInstance sound;
-    public float time;
+    public float endTime;
     public ulong delaySamples;
 }
 

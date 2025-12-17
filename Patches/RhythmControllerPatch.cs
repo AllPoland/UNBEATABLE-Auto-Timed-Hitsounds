@@ -23,12 +23,15 @@ class RhythmControllerPatch
     static bool OnDestroyPrefix()
     {
         // Clear our hitsound state so we don't memory leak all over the place
-        HitsoundManager.ScheduledSounds.Clear();
-        foreach(KeyValuePair<ScheduledNote, ScheduledSound> pair in HitsoundManager.PlayedSounds)
+        for(byte id = 0; id < HitsoundManager.ScheduledSounds.Length; id++)
         {
-            pair.Value.sound.stop(STOP_MODE.IMMEDIATE);
+            HitsoundManager.ScheduledSounds[id].Clear();
+            foreach(KeyValuePair<BaseNote, ScheduledSound> pair in HitsoundManager.PlayedSounds[id])
+            {
+                pair.Value.sound.stop(STOP_MODE.IMMEDIATE);
+            }
+            HitsoundManager.PlayedSounds[id].Clear();
         }
-        HitsoundManager.PlayedSounds.Clear();
 
         HitsoundManager.ScheduledHolds.Clear();
         foreach(KeyValuePair<BaseNote, ScheduledHold> pair in HitsoundManager.PlayedHolds)

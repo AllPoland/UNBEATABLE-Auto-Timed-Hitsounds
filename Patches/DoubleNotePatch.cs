@@ -12,13 +12,13 @@ public class DoubleNotePatch
         // Schedule the hitsound if necessary
         if(HitsoundManager.ShouldNoteSchedule(__instance))
         {
-            HitsoundManager.ScheduleNote(__instance, __instance.controller.hitSFX);
+            HitsoundManager.ScheduleNote(__instance, __instance.controller.hitSFX, __instance.hitTime, __instance.endTime);
         }
 
         // Schedule the hitsound for the second hit if necessary
         if(HitsoundManager.ShouldNoteSchedule(__instance, 1))
         {
-            HitsoundManager.ScheduleNote(__instance, __instance.controller.hitSFX, __instance.endTime, 1);
+            HitsoundManager.ScheduleNote(__instance, __instance.controller.hitSFX, __instance.endTime, __instance.endTime, 1);
         }
 
         // Perform the original method
@@ -30,16 +30,10 @@ public class DoubleNotePatch
     [HarmonyPrefix]
     static bool RhythmUpdate_StunnedPrefix(DoubleNote __instance)
     {
-        // Schedule the hitsound if necessary
-        if(HitsoundManager.ShouldNoteSchedule(__instance))
-        {
-            HitsoundManager.ScheduleNote(__instance, __instance.controller.hitSFX);
-        }
-
         // Schedule the hitsound for the second hit if necessary
         if(HitsoundManager.ShouldNoteSchedule(__instance, 1))
         {
-            HitsoundManager.ScheduleNote(__instance, __instance.controller.hitSFX, __instance.endTime, 1);
+            HitsoundManager.ScheduleNote(__instance, __instance.controller.hitSFX, __instance.endTime, __instance.endTime, 1);
         }
 
         // Perform the original method

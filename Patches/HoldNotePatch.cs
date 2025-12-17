@@ -18,7 +18,7 @@ public class HoldNotePatch
         // Schedule the release hitsound if necessary
         if(HitsoundManager.ShouldNoteSchedule(__instance))
         {
-            HitsoundManager.ScheduleNote(__instance, __instance.controller.hitSFX, __instance.endTime);
+            HitsoundManager.ScheduleNote(__instance, __instance.controller.hitSFX, __instance.endTime, __instance.endTime);
         }
 
         // Perform the original method
@@ -39,7 +39,7 @@ public class HoldNotePatch
         // Schedule the release hitsound if necessary
         if(HitsoundManager.ShouldNoteSchedule(__instance))
         {
-            HitsoundManager.ScheduleNote(__instance, __instance.controller.hitSFX, __instance.endTime);
+            HitsoundManager.ScheduleNote(__instance, __instance.controller.hitSFX, __instance.endTime, __instance.endTime);
         }
 
         // Perform the original method
