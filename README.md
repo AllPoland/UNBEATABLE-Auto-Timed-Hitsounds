@@ -22,6 +22,7 @@ I made this mod mainly for personal use, since I find button-based hitsounds to 
 # Installation
 
 - Download [BepInEx 5.4 or later](https://github.com/BepInEx/BepInEx/releases) (Make sure you grab the win_x64 version!!!) and extract the files into your UNBEATABLE game folder.
+  - FOR LINUX USERS: BepInEx needs an extra setup step to run through Proton. Instructions for this can be found [here](https://docs.bepinex.dev/articles/advanced/proton_wine.html)
 
 - Download the latest mod release from the [releases page](releases/latest) and extract to your game folder.
 
