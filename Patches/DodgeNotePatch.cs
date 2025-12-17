@@ -9,10 +9,26 @@ public class DodgeNotePatch
     [HarmonyPrefix]
     static bool RhythmUpdatePrefix(DodgeNote __instance)
     {
-        // Schedule the hitsound if necessary
-        if(HitsoundManager.ShouldNoteSchedule(__instance))
+        if(__instance.isPast)
         {
-            HitsoundManager.ScheduleNote(__instance, __instance.controller.dodgeSFX);
+            DodgeNoteStateManager.UnregisterNote(__instance);
+            return true;
+        }
+
+        DodgeNoteState state = DodgeNoteStateManager.GetState(__instance);
+        if(!state.markedForSound && __instance.height == __instance.player.height && __instance.WithinHitRange())
+        {
+            state.markedForSound = true;
+            DodgeNoteStateManager.States[__instance] = state;
+        }
+
+        if(state.markedForSound)
+        {
+            // Schedule the hitsound if necessary
+            if(HitsoundManager.ShouldNoteSchedule(__instance))
+            {
+                HitsoundManager.ScheduleNote(__instance, __instance.controller.dodgeSFX);
+            }
         }
 
         // Perform the original method
