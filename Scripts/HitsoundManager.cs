@@ -200,7 +200,27 @@ public static class HitsoundManager
     }
 
 
-    public static void UnregisterNote(BaseNote note, byte id)
+    public static int CountRegisteredNotes()
+    {
+        int registeredCount = 0;
+        for(byte id = 0; id < PlayedSounds.Length; id++)
+        {
+            foreach(KeyValuePair<BaseNote, ScheduledSound> pair in PlayedSounds[id])
+            {
+                registeredCount++;
+            }
+        }
+        foreach(KeyValuePair<BaseNote, ScheduledHold> pair in PlayedHolds)
+        {
+            registeredCount++;
+        }
+
+        Plugin.Logger.LogInfo($"registered count: {registeredCount}");
+        return registeredCount;
+    }
+
+
+    public static void UnregisterNote(BaseNote note, byte id = 0)
     {
         ScheduledSounds[id].Remove(note);
         if(PlayedSounds[id].ContainsKey(note))
