@@ -25,14 +25,6 @@ public class Plugin : BaseUnityPlugin
         {
             Logger.LogInfo("Patching out base game hitsounds.");
             Harmony.CreateAndPatchAll(typeof(RhythmController_Mute_Patch));
-        }
-        catch(System.Exception e)
-        {
-            Logger.LogFatal($"{e.Message}, {e.StackTrace}");
-        }
-
-        try
-        {
             Harmony.CreateAndPatchAll(typeof(RhythmBaseCharacter_Mute_Patch));
         }
         catch(System.Exception e)
