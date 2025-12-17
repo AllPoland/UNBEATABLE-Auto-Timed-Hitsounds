@@ -14,10 +14,10 @@ I mean, why do anything, really?
 
 I made this mod mainly for personal use, since I find button-based hitsounds to be unbearable in any rhythm game. The reasons for that being:
 1. Button-based hitsounds mask the actual intended rhythm whenever you get a bit off, making it harder to get back on track
-2. Button-based hitsounds give no telegraph for what rhythm was *actually* mapped, exacerbating issues like overmapping or inconsistent rhythm choice
-3. Button-based hitsounds always have some amount of latency compared to your inputs, no matter your offsets or setup, while automatic hitsounds are *always* on time, no matter your offsets or setup
+2. Button-based hitsounds give no telegraph for what rhythm was *actually* mapped, exacerbating issues like overmapping and inconsistent rhythm choice
+3. Button-based hitsounds *always* have some amount of latency compared to your inputs, no matter your offsets or setup, while automatic hitsounds are *always* on time, no matter your offsets or setup
 4. Automatic hitsounds sound better because they actually line up to the music
-5. Automatic hitsounds improve game feel by making you feel more on-beat even if you're way off (while also helping you actually stay on beat!)
+5. Automatic hitsounds feel better by making you sound more on-beat even if you're way off (while also helping you actually stay on beat!)
 
 # Installation
 
