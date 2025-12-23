@@ -14,7 +14,7 @@ public class DoubleNotePatch
         SoundQueue<BaseNote> queue = HitsoundManager.BaseQueue;
         if(queue.ShouldNoteSchedule(__instance))
         {
-            bool useAssistSound = HitsoundUtil.UseAssistSound(__instance, __instance.height, __instance.hitTime);
+            bool useAssistSound = HitsoundUtil.UseAssistSound(__instance.height, __instance.hitTime);
             EventReference sfx = useAssistSound ? __instance.controller.hitAssistSFX : __instance.controller.hitSFX;
 
             // Plug in the end time to avoid unscheduling this sound before the entire note is done
@@ -25,7 +25,7 @@ public class DoubleNotePatch
         // Schedule the hitsound for the second hit if necessary
         if(queue.ShouldNoteSchedule(__instance, 1))
         {
-            bool useAssistSound = HitsoundUtil.UseAssistSound(__instance, HeightUtil.OppositeHeight(__instance.height), __instance.endTime);
+            bool useAssistSound = HitsoundUtil.UseAssistSound(HeightUtil.OppositeHeight(__instance.height), __instance.endTime);
             EventReference sfx = useAssistSound ? __instance.controller.hitAssistSFX : __instance.controller.hitSFX;
             queue.ScheduleNote(__instance, sfx, __instance.endTime, __instance.endTime, 1);
         }
@@ -43,7 +43,7 @@ public class DoubleNotePatch
         SoundQueue<BaseNote> queue = HitsoundManager.BaseQueue;
         if(queue.ShouldNoteSchedule(__instance, 1))
         {
-            bool useAssistSound = HitsoundUtil.UseAssistSound(__instance, __instance.height, __instance.endTime);
+            bool useAssistSound = HitsoundUtil.UseAssistSound(__instance.height, __instance.endTime);
             EventReference sfx = useAssistSound ? __instance.controller.hitAssistSFX : __instance.controller.hitSFX;
             queue.ScheduleNote(__instance, sfx, __instance.endTime, __instance.endTime, 1);
         }

@@ -13,7 +13,9 @@ public class SpamNotePatch
         // Schedule the hitsound if necessary
         if(HitsoundManager.BaseQueue.ShouldNoteSchedule(__instance))
         {
-            HitsoundManager.BaseQueue.ScheduleNote(__instance, __instance.hitTime, __instance.controller.hitSFX);
+            bool useAssistSound = HitsoundUtil.UseAssistSound(__instance.height, __instance.hitTime);
+            EventReference sfx = useAssistSound ? __instance.controller.hitAssistSFX : __instance.controller.hitSFX;
+            HitsoundManager.BaseQueue.ScheduleNote(__instance, __instance.hitTime, sfx);
         }
 
         // Perform the original method

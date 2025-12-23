@@ -78,9 +78,9 @@ public static class HitsoundUtil
     }
 
 
-    public static bool UseAssistSound(BaseNote note, Height height, float hitTime)
+    public static bool UseAssistSound(Height height, float hitTime)
     {
-        RhythmPlayer player = note.controller.player;
+        RhythmPlayer player = RhythmController.Instance.player;
 
         if(player.heldTop && height == Height.Top)
         {

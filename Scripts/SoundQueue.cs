@@ -68,7 +68,6 @@ public class SoundQueue<T>
 
     public bool ShouldNoteSchedule(T note, byte id = 0)
     {
-
         return !ScheduledSounds[id].ContainsKey(note) && !PlayedSounds[id].ContainsKey(note);
     }
 

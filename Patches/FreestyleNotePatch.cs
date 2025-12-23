@@ -12,7 +12,7 @@ public class FreestyleNotePatch
         SoundQueue<BaseNote> queue = HitsoundManager.BaseQueue;
         if(queue.ShouldNoteSchedule(__instance))
         {
-            bool useAssistSound = HitsoundUtil.UseAssistSound(__instance, __instance.height, __instance.hitTime);
+            bool useAssistSound = HitsoundUtil.UseAssistSound(__instance.height, __instance.hitTime);
             EventReference sfx = useAssistSound ? __instance.controller.hitAssistSFX : __instance.controller.hitSFX;
             queue.ScheduleNote(__instance, __instance.hitTime, sfx);
         }
@@ -27,7 +27,7 @@ public class FreestyleNotePatch
             // Schedule the hitsound for each child if necessary
             if(queue.ShouldNoteSchedule(child))
             {
-                bool useAssistSound = HitsoundUtil.UseAssistSound(child, child.height, child.hitTime);
+                bool useAssistSound = HitsoundUtil.UseAssistSound(child.height, child.hitTime);
                 EventReference sfx = useAssistSound ? child.controller.hitAssistSFX : child.controller.hitSFX;
                 queue.ScheduleNote(child, child.hitTime, sfx);
             }
