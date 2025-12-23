@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using FMOD;
 using FMOD.Studio;
 using FMODUnity;
 using Rhythm;
@@ -15,24 +14,10 @@ public static class HitsoundManager
     public static Dictionary<BaseNote, ScheduledHold> PlayedHolds = new Dictionary<BaseNote, ScheduledHold>();
     public static Dictionary<BaseNote, ScheduledHold> ScheduledHolds = new Dictionary<BaseNote, ScheduledHold>();
 
-    public static EventInstance SongInstance;
-    public static float CountdownLength;
-
 
     public static void ScheduleNote(BaseNote note, EventReference sfx, float noteTime, float endTime, byte id = 0)
     {
-        RESULT result = SongInstance.getTimelinePosition(out int songPosition);
-        if(result != RESULT.OK)
-        {
-            Plugin.Logger.LogWarning($"Failed to get song position: {result}");
-            return;
-        }
-
-        if(note.controller.enableCountdown && songPosition <= 0f)
-        {
-            // We're in the countdown time, so we need to use the countdown position instead
-            songPosition = (int)(note.controller.songTracker.CountdownPosition - CountdownLength);
-        }
+        float songPosition = TimeHelper.GetSongPosMS();
 
         float noteOffset = noteTime - songPosition;
         if(noteOffset > Plugin.MaxScheduleOffset || noteOffset < Plugin.MinScheduleOffset)
@@ -42,10 +27,9 @@ public static class HitsoundManager
         }
 
         int sampleRate = AudioSettings.GetSampleRate();
-        ulong songSamples = (ulong)(songPosition / 1000f * sampleRate);
-        ulong noteSamples = (ulong)(noteTime / 1000f * sampleRate);
+        ulong noteSamples = (ulong)(noteTime * (sampleRate / 1000));
 
-        ScheduledSound newSound = FMODHelper.ScheduleSound(sfx, songSamples, noteSamples);
+        ScheduledSound newSound = FMODHelper.ScheduleSound(sfx, noteSamples);
         newSound.endTime = endTime;
 
         ScheduledSounds[id].Add(note, newSound);
@@ -62,18 +46,7 @@ public static class HitsoundManager
 
     public static void ScheduleHold(HoldNote note, EventReference sfx)
     {
-        RESULT result = SongInstance.getTimelinePosition(out int songPosition);
-        if(result != RESULT.OK)
-        {
-            Plugin.Logger.LogWarning($"Failed to get song position: {result}");
-            return;
-        }
-
-        if(note.controller.enableCountdown && songPosition <= 0f)
-        {
-            // We're in the countdown time, so we need to use the countdown position instead
-            songPosition = (int)(note.controller.songTracker.CountdownPosition - CountdownLength);
-        }
+        float songPosition = TimeHelper.GetSongPosMS();
 
         float startTime = note.hitTime;
         float noteOffset = startTime - songPosition;
@@ -86,11 +59,11 @@ public static class HitsoundManager
         float endTime = note.endTime;
 
         int sampleRate = AudioSettings.GetSampleRate();
-        ulong songSamples = (ulong)(songPosition / 1000f * sampleRate);
-        ulong startSamples = (ulong)(startTime / 1000f * sampleRate);
-        ulong endSamples = (ulong)(endTime / 1000f * sampleRate);
+        int mult = sampleRate / 1000;
+        ulong startSamples = (ulong)(startTime * mult);
+        ulong endSamples = (ulong)(endTime * mult);
 
-        ScheduledHold newHold = FMODHelper.ScheduleHold(sfx, songSamples, startSamples, endSamples);
+        ScheduledHold newHold = FMODHelper.ScheduleHold(sfx, startSamples, endSamples);
         newHold.endTime = endTime;
 
         ScheduledHolds.Add(note, newHold);
@@ -156,12 +129,7 @@ public static class HitsoundManager
     public static void DisposeOldSounds()
     {
         const float MinTimeOffsetToDispose = 500f;
-        RESULT result = SongInstance.getTimelinePosition(out int songPosition);
-        if(result != RESULT.OK)
-        {
-            Plugin.Logger.LogWarning($"Failed to get song position: {result}");
-            return;
-        }
+        float songPosition = TimeHelper.GetSongPosMS();
 
         for(byte id = 0; id < PlayedSounds.Length; id++)
         {
@@ -247,7 +215,7 @@ public struct ScheduledSound
 {
     public EventInstance sound;
     public float endTime;
-    public ulong delaySamples;
+    public ulong startSamples;
 }
 
 
@@ -255,6 +223,6 @@ public struct ScheduledHold
 {
     public EventInstance sound;
     public float endTime;
-    public ulong delaySamples;
-    public ulong endDelaySamples;
+    public ulong startSamples;
+    public ulong endSamples;
 }
