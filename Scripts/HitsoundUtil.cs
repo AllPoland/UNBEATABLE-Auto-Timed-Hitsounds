@@ -52,30 +52,17 @@ public static class HitsoundUtil
                 // This hold is the same height as our note, so it wouldn't cause an assist
                 continue;
             }
+
+            if(holdNote.endTime < hitTime + Mathf.Epsilon)
+            {
+                continue;
+            }
             
             // After becoming stunned, the hold's hitTime is set to endTime (thereby setting its length to zero)
             // This is jank but these are the things we do when the state is private
             bool isHeld = Mathf.Abs(holdNote.lengthTime) < Mathf.Epsilon;
-            if(isHeld)
+            if(isHeld || holdNote.hitTime <= hitTime - Mathf.Epsilon)
             {
-                // Make sure the player is actually holding this note
-                if(player.heldTop && holdHeight != Height.Top)
-                {
-                    continue;
-                }
-                if(player.heldLow && holdHeight != Height.Low)
-                {
-                    continue;
-                }
-
-                if(holdNote.endTime >= hitTime + Mathf.Epsilon)
-                {
-                    return true;
-                }
-            }
-            else if(holdNote.hitTime <= hitTime - Mathf.Epsilon && holdNote.endTime >= hitTime + Mathf.Epsilon)
-            {
-                // The hold isn't *currently* held, but it will be by the time we hit this note
                 return true;
             }
         }
