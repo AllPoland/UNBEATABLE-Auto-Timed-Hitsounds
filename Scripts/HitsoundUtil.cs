@@ -94,9 +94,7 @@ public static class HitsoundUtil
         List<BaseHold> holdNotes = GetActiveHoldNotes();
         foreach(BaseHold hold in holdNotes)
         {
-            Height holdHeight = hold.height;
-
-            if(holdHeight == height)
+            if(hold.height == height)
             {
                 // This hold is the same height as our note, so it wouldn't cause an assist
                 continue;
@@ -104,16 +102,20 @@ public static class HitsoundUtil
 
             if(hold.endTime < hitTime + Mathf.Epsilon)
             {
+                // This hold won't be here by the time we reach the note
                 continue;
             }
-            
+
             // After becoming stunned, the hold's hitTime is set to endTime (thereby setting its length to zero)
             // This is jank but these are the things we do when the state is private
             bool isHeld = Mathf.Abs(hold.lengthTime) < Mathf.Epsilon;
-            if(isHeld || hold.hitTime <= hitTime - Mathf.Epsilon)
+            if(!isHeld && hold.hitTime > hitTime - Mathf.Epsilon)
             {
-                return true;
+                // The hold starts after this note
+                continue;
             }
+
+            return true;
         }
 
         return false;
