@@ -25,9 +25,9 @@ public class DodgeNotePatch
         if(state.markedForSound)
         {
             // Schedule the hitsound if necessary
-            if(HitsoundManager.ShouldNoteSchedule(__instance))
+            if(HitsoundManager.BaseQueue.ShouldNoteSchedule(__instance))
             {
-                HitsoundManager.ScheduleNote(__instance, __instance.controller.dodgeSFX);
+                HitsoundManager.BaseQueue.ScheduleNote(__instance, __instance.hitTime, __instance.controller.dodgeSFX);
             }
         }
 

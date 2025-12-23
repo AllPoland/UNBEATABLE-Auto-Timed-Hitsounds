@@ -21,6 +21,7 @@ public class Plugin : BaseUnityPlugin
         Logger = base.Logger;
 
         // Patch all method overrides
+        bool errored = false;
         try
         {
             Logger.LogInfo("Patching out base game hitsounds.");
@@ -30,6 +31,7 @@ public class Plugin : BaseUnityPlugin
         catch(System.Exception e)
         {
             Logger.LogFatal($"{e.Message}, {e.StackTrace}");
+            errored = true;
         }
 
         try
@@ -42,12 +44,18 @@ public class Plugin : BaseUnityPlugin
             Harmony.CreateAndPatchAll(typeof(FreestyleNotePatch));
             Harmony.CreateAndPatchAll(typeof(HoldNotePatch));
             Harmony.CreateAndPatchAll(typeof(SpamNotePatch));
+            Harmony.CreateAndPatchAll(typeof(BrawlNotePatch));
         }
         catch(System.Exception e)
         {
             Logger.LogFatal($"{e.Message}, {e.StackTrace}");
+            errored = true;
         }
 
-        Logger.LogInfo($"Plugin {PluginReleaseInfo.PLUGIN_GUID} is loaded!");
+        if(errored)
+        {
+            Logger.LogFatal($"Plugin {PluginReleaseInfo.PLUGIN_GUID} failed to load properly!");
+        }
+        else Logger.LogInfo($"Plugin {PluginReleaseInfo.PLUGIN_GUID} is loaded!");
     }
 }

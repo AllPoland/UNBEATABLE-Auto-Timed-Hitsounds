@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using HarmonyLib;
 using FMOD.Studio;
 using Rhythm;
@@ -36,22 +35,7 @@ class RhythmControllerPatch
     static bool OnDestroyPrefix()
     {
         // Clear our hitsound state so we don't memory leak all over the place
-        for(byte id = 0; id < HitsoundManager.ScheduledSounds.Length; id++)
-        {
-            HitsoundManager.ScheduledSounds[id].Clear();
-            foreach(KeyValuePair<BaseNote, ScheduledSound> pair in HitsoundManager.PlayedSounds[id])
-            {
-                pair.Value.sound.stop(STOP_MODE.IMMEDIATE);
-            }
-            HitsoundManager.PlayedSounds[id].Clear();
-        }
-
-        HitsoundManager.ScheduledHolds.Clear();
-        foreach(KeyValuePair<BaseNote, ScheduledHold> pair in HitsoundManager.PlayedHolds)
-        {
-            pair.Value.sound.stop(STOP_MODE.IMMEDIATE);
-        }
-        HitsoundManager.PlayedHolds.Clear();
+        HitsoundManager.UnregisterAllSounds();
         return true;
     }
 
@@ -62,7 +46,6 @@ class RhythmControllerPatch
     {
         // HitsoundManager piggybacks off of FixedUpdate as long as RhythmController is active
         HitsoundManager.UpdateScheduledSounds();
-        HitsoundManager.UpdateScheduledHolds();
         HitsoundManager.DisposeOldSounds();
         return true;
     }

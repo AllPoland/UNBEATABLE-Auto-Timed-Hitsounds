@@ -11,11 +11,11 @@ public class DefaultNotePatch
     static bool RhythmUpdate_MovingPrefix(DefaultNote __instance)
     {
         // Schedule the hitsound if necessary
-        if(HitsoundManager.ShouldNoteSchedule(__instance))
+        if(HitsoundManager.BaseQueue.ShouldNoteSchedule(__instance))
         {
             bool useAssistSound = HitsoundUtil.UseAssistSound(__instance, __instance.height, __instance.hitTime);
             EventReference sfx = useAssistSound ? __instance.controller.hitAssistSFX : __instance.controller.hitSFX;
-            HitsoundManager.ScheduleNote(__instance, sfx);
+            HitsoundManager.BaseQueue.ScheduleNote(__instance, __instance.hitTime, sfx);
         }
 
         // Perform the original method

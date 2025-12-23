@@ -11,9 +11,9 @@ public class SpamNotePatch
     static bool RhythmUpdate_MovingPrefix(SpamNote __instance)
     {
         // Schedule the hitsound if necessary
-        if(HitsoundManager.ShouldNoteSchedule(__instance))
+        if(HitsoundManager.BaseQueue.ShouldNoteSchedule(__instance))
         {
-            HitsoundManager.ScheduleNote(__instance, __instance.controller.hitSFX);
+            HitsoundManager.BaseQueue.ScheduleNote(__instance, __instance.hitTime, __instance.controller.hitSFX);
         }
 
         // Perform the original method

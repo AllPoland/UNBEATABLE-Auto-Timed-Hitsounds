@@ -9,11 +9,12 @@ public class FreestyleNotePatch
     private static void RhythmUpdate(FreestyleNote __instance)
     {
         // Schedule the hitsound if necessary
-        if(HitsoundManager.ShouldNoteSchedule(__instance))
+        SoundQueue<BaseNote> queue = HitsoundManager.BaseQueue;
+        if(queue.ShouldNoteSchedule(__instance))
         {
             bool useAssistSound = HitsoundUtil.UseAssistSound(__instance, __instance.height, __instance.hitTime);
             EventReference sfx = useAssistSound ? __instance.controller.hitAssistSFX : __instance.controller.hitSFX;
-            HitsoundManager.ScheduleNote(__instance, sfx);
+            queue.ScheduleNote(__instance, __instance.hitTime, sfx);
         }
 
         if(!__instance.hasChildNotes)
@@ -24,11 +25,11 @@ public class FreestyleNotePatch
         foreach(FreestyleNote child in __instance.childNotes)
         {
             // Schedule the hitsound for each child if necessary
-            if(HitsoundManager.ShouldNoteSchedule(child))
+            if(queue.ShouldNoteSchedule(child))
             {
                 bool useAssistSound = HitsoundUtil.UseAssistSound(child, child.height, child.hitTime);
                 EventReference sfx = useAssistSound ? child.controller.hitAssistSFX : child.controller.hitSFX;
-                HitsoundManager.ScheduleNote(child, sfx);
+                queue.ScheduleNote(child, child.hitTime, sfx);
             }
         }
     }

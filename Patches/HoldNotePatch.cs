@@ -10,8 +10,9 @@ public class HoldNotePatch
     static bool OnDestroyPrefix(HoldNote __instance)
     {
         // The note gets destroyed when the player releases early, so stop any sounds here
-        HitsoundManager.UnregisterNote(__instance);
-        HitsoundManager.UnregisterHold(__instance);
+        SoundQueue<BaseNote> queue = HitsoundManager.BaseQueue;
+        queue.UnregisterNote(__instance);
+        queue.UnregisterHold(__instance);
 
         // Perform the original method
         return true;
@@ -23,15 +24,16 @@ public class HoldNotePatch
     static bool RhythmUpdate_MovingPrefix(HoldNote __instance)
     {
         // Schedule the hold sound if necessary
-        if(HitsoundManager.ShouldHoldSchedule(__instance))
+        SoundQueue<BaseNote> queue = HitsoundManager.BaseQueue;
+        if(queue.ShouldHoldSchedule(__instance))
         {
-            HitsoundManager.ScheduleHold(__instance, __instance.controller.holdSFX);
+            queue.ScheduleHold(__instance, __instance.hitTime, __instance.endTime, __instance.controller.holdSFX);
         }
 
         // Schedule the release hitsound if necessary
-        if(HitsoundManager.ShouldNoteSchedule(__instance))
+        if(queue.ShouldNoteSchedule(__instance))
         {
-            HitsoundManager.ScheduleNote(__instance, __instance.controller.hitSFX, __instance.endTime, __instance.endTime);
+            queue.ScheduleNote(__instance, __instance.controller.hitSFX, __instance.endTime, __instance.endTime);
         }
 
         // Perform the original method
@@ -44,9 +46,10 @@ public class HoldNotePatch
     static bool RhythmUpdate_StunnedPrefix(HoldNote __instance)
     {
         // Schedule the release hitsound if necessary
-        if(HitsoundManager.ShouldNoteSchedule(__instance))
+        SoundQueue<BaseNote> queue = HitsoundManager.BaseQueue;
+        if(queue.ShouldNoteSchedule(__instance))
         {
-            HitsoundManager.ScheduleNote(__instance, __instance.controller.hitSFX, __instance.endTime, __instance.endTime);
+            queue.ScheduleNote(__instance, __instance.controller.hitSFX, __instance.endTime, __instance.endTime);
         }
 
         // Perform the original method
