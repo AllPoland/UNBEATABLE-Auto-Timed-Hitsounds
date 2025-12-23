@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace AutoTimedHitsounds;
 
-
 public class SoundQueue<T>
 {
     public Dictionary<T, ScheduledSound>[] PlayedSounds = [[],[]];
