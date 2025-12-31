@@ -16,6 +16,7 @@ class RhythmControllerPatch
         Traverse tracker = Traverse.Create(__instance.songTracker);
         TimeHelper.SongInstance = tracker.Field("instance").GetValue<EventInstance>();
         TimeHelper.positionOffset = tracker.Field("positionOffset").GetValue<float>();
+        TimeHelper.audioOffset = FileStorage.options.GetAudioOffset();
 
         TimeHelper.enableCountdown = __instance.enableCountdown;
         TimeHelper.RhythmTracker = __instance.songTracker;

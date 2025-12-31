@@ -11,6 +11,7 @@ public static class TimeHelper
     public static RhythmTracker RhythmTracker;
 
     public static float positionOffset;
+    public static float audioOffset;
     public static bool enableCountdown;
     public static float CountdownLength;
 
@@ -30,7 +31,7 @@ public static class TimeHelper
             return RhythmTracker.CountdownPosition - CountdownLength;
         }
 
-        return timelinePosition + positionOffset;
+        return timelinePosition + positionOffset - audioOffset;
     }
 
 
