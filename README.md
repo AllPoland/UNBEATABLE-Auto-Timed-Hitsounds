@@ -26,5 +26,6 @@ I made this mod mainly for personal use, since I find button-based hitsounds to 
 
 This mod is mostly complete, and should work in both arcade and story mode. Below are some things I still need to do.
 
-- More story mode testing
+- Testing a full story mode playthrough
 - Config options (toggling features, adjusting scheduling values, etc.)
+- Bug testing and fixes (please report issues!)
