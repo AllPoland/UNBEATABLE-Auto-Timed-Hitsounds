@@ -21,14 +21,13 @@ public static class TimeHelper
         RESULT result = SongInstance.getTimelinePosition(out int timelinePosition);
         if(result != RESULT.OK)
         {
-            Plugin.Logger.LogWarning($"Failed to get song position: {result}");
             return RhythmTracker.Position;
         }
 
-        if(enableCountdown && timelinePosition <= 0f)
+        if(timelinePosition <= 0f)
         {
             // We're in the countdown time, so we need to use the countdown position instead
-            return RhythmTracker.CountdownPosition - CountdownLength;
+            return RhythmTracker.Position;
         }
 
         return timelinePosition + positionOffset - audioOffset;
