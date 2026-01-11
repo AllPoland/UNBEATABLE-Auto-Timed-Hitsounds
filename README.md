@@ -24,7 +24,7 @@ I made this mod mainly for personal use, since I find button-based hitsounds to 
 
 # TODO
 
-This mod is not yet done!! Currently, the mod is only mostly complete for use in arcade mode, and *should* work in story mode (in theory, it's still not tested in a full playthrough. Please report any issues). Below are some things I still need to do.
+This mod is mostly complete, and should work in both arcade and story mode. Below are some things I still need to do.
 
-- Story mode testing
+- More story mode testing
 - Config options (toggling features, adjusting scheduling values, etc.)
