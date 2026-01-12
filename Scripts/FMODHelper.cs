@@ -40,6 +40,11 @@ public static class FMODHelper
 
         ulong songSamples = TimeHelper.GetSongPosSamples();
         ulong delay = sound.startSamples - songSamples;
+        if(delay <= 0)
+        {
+            // It's too late to try playing this sound
+            return true;
+        }
 
         channelGroup.getDSPClock(out ulong _, out ulong parentClock);
 
@@ -64,6 +69,11 @@ public static class FMODHelper
         ulong songSamples = TimeHelper.GetSongPosSamples();
         ulong delay = hold.startSamples - songSamples;
         ulong endDelay = hold.endSamples - songSamples;
+        if(delay <= 0 || endDelay <= 0)
+        {
+            // It's too late to try playing this sound
+            return true;
+        }
 
         channelGroup.getDSPClock(out ulong _, out ulong parentClock);
 

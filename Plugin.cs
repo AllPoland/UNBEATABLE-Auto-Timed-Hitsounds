@@ -12,7 +12,6 @@ public class Plugin : BaseUnityPlugin
     internal static new ManualLogSource Logger;
 
     public static float MaxScheduleOffset => RhythmConsts.LeniencyMilliseconds + 20f;
-    public static float MinScheduleOffset = 20f;
 
         
     private void Awake()

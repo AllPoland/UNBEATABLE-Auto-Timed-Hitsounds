@@ -1,7 +1,6 @@
 using FMOD;
 using FMOD.Studio;
 using Rhythm;
-using UnityEngine;
 
 namespace AutoTimedHitsounds;
 
@@ -10,10 +9,11 @@ public static class TimeHelper
     public static EventInstance SongInstance;
     public static RhythmTracker RhythmTracker;
 
-    public static float positionOffset;
-    public static float audioOffset;
-    public static bool enableCountdown;
-    public static float CountdownLength;
+    public static float PositionOffset;
+    public static float VisualOffset;
+    public static float InputOffset;
+
+    public static float SampleRateMS;
 
 
     public static float GetSongPosMS()
@@ -30,15 +30,30 @@ public static class TimeHelper
             return RhythmTracker.Position;
         }
 
-        return timelinePosition + positionOffset - audioOffset;
+        return timelinePosition + PositionOffset;
     }
 
 
     public static ulong GetSongPosSamples()
     {
-        float songPosition = GetSongPosMS();
+        return (ulong)(GetSongPosMS() * SampleRateMS);
+    }
 
-        int sampleRate = AudioSettings.GetSampleRate();
-        return (ulong)(songPosition * (sampleRate / 1000));
+
+    public static float GetInputPosMS()
+    {
+        return GetSongPosMS() + InputOffset;
+    }
+
+
+    public static float GetScheduleMS(float noteTime)
+    {
+        return noteTime + VisualOffset;
+    }
+
+
+    public static ulong GetScheduleSamples(float noteTime)
+    {
+        return (ulong)(GetScheduleMS(noteTime) * SampleRateMS);
     }
 }

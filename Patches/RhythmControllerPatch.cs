@@ -1,7 +1,7 @@
 using HarmonyLib;
 using FMOD.Studio;
 using Rhythm;
-using System.Linq;
+using UnityEngine;
 
 namespace AutoTimedHitsounds.Patches;
 
@@ -15,19 +15,15 @@ class RhythmControllerPatch
         // Good to cache this because we need to use Traverse to access the private property on RhythmTracker
         Traverse tracker = Traverse.Create(__instance.songTracker);
         TimeHelper.SongInstance = tracker.Field("instance").GetValue<EventInstance>();
-        TimeHelper.positionOffset = tracker.Field("positionOffset").GetValue<float>();
-        TimeHelper.audioOffset = FileStorage.options.GetAudioOffset();
 
-        TimeHelper.enableCountdown = __instance.enableCountdown;
+        TimeHelper.PositionOffset = tracker.Field("positionOffset").GetValue<float>();
+        TimeHelper.VisualOffset = FileStorage.options.GetVideoOffset();
+
+        // "Audio Offset" is a misnomer for this - it's only used for timing judgement offsets
+        TimeHelper.InputOffset = FileStorage.options.GetAudioOffset();
+        TimeHelper.SampleRateMS = AudioSettings.GetSampleRate() / 1000f;
+
         TimeHelper.RhythmTracker = __instance.songTracker;
-
-        if(__instance.enableCountdown)
-        {
-            // Save the countdown length so that we can calculate negative time values
-            // This is necessary in order to schedule notes placed within the first few ms of the map (or at 0ms)
-            TimingPointInfo timingPointInfo = __instance.beatmap.timingPoints.FirstOrDefault(x => x.beatLength > 0f);
-            TimeHelper.CountdownLength = 750f + 8f * timingPointInfo.beatLength;
-        }
     }
 
 

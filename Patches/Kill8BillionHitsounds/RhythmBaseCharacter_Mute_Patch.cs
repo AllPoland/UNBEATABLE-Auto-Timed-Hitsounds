@@ -28,12 +28,12 @@ class RhythmBaseCharacter_Mute_Patch
             if(codes[i].Calls(targetMethod))
             {
                 // Bye bye hitsound :D
-                Plugin.Logger.LogInfo($"Removing instruction: {original.DeclaringType}.{original.Name}[{i}]");
+                // Plugin.Logger.LogInfo($"Removing instruction: {original.DeclaringType}.{original.Name}[{i}]");
                 codes[i].opcode = OpCodes.Nop;
             }
         }
 
-        Plugin.Logger.LogInfo($"Done patching {original.DeclaringType}.{original.Name}()");
+        // Plugin.Logger.LogInfo($"Done patching {original.DeclaringType}.{original.Name}()");
         return codes.AsEnumerable();
     }
 }

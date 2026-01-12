@@ -9,10 +9,13 @@ public class HoldNotePatch
     [HarmonyPrefix]
     static bool OnDestroyPrefix(HoldNote __instance)
     {
-        // The note gets destroyed when the player releases early, so stop any sounds here
-        SoundQueue<BaseNote> queue = HitsoundManager.BaseQueue;
-        queue.UnregisterNote(__instance);
-        queue.UnregisterHold(__instance);
+        if(!__instance.WithinHitRange())
+        {
+            // The note gets destroyed when the player releases early, so stop any sounds here
+            SoundQueue<BaseNote> queue = HitsoundManager.BaseQueue;
+            queue.UnregisterNote(__instance);
+            queue.UnregisterHold(__instance);
+        }
 
         // Perform the original method
         return true;

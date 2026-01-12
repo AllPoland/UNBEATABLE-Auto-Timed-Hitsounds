@@ -1,6 +1,6 @@
 using System.Collections.Generic;
+using FMOD.Studio;
 using FMODUnity;
-using UnityEngine;
 
 namespace AutoTimedHitsounds;
 
@@ -15,17 +15,17 @@ public class SoundQueue<T>
 
     public void ScheduleNote(T note, EventReference sfx, float noteTime, float endTime, byte id = 0)
     {
-        float songPosition = TimeHelper.GetSongPosMS();
+        // Use the input position for this part to make sure we schedule the sound before the note is in hit range
+        float inputPosition = TimeHelper.GetInputPosMS();
 
-        float noteOffset = noteTime - songPosition;
-        if(noteOffset > Plugin.MaxScheduleOffset || noteOffset < Plugin.MinScheduleOffset)
+        float noteOffset = noteTime - inputPosition;
+        if(noteOffset > Plugin.MaxScheduleOffset)
         {
-            // It's either too late or too early to schedule this
+            // It's too early to schedule this
             return;
         }
 
-        int sampleRate = AudioSettings.GetSampleRate();
-        ulong noteSamples = (ulong)(noteTime * (sampleRate / 1000));
+        ulong noteSamples = TimeHelper.GetScheduleSamples(noteTime);
 
         ScheduledSound newSound = FMODHelper.ScheduleSound(sfx, noteSamples);
         newSound.endTime = endTime;
@@ -44,19 +44,18 @@ public class SoundQueue<T>
 
     public void ScheduleHold(T note, float startTime, float endTime, EventReference sfx)
     {
-        float songPosition = TimeHelper.GetSongPosMS();
+        // Use the input position for this part to make sure we schedule the sound before the note is in hit range
+        float inputPosition = TimeHelper.GetInputPosMS();
 
-        float noteOffset = startTime - songPosition;
+        float noteOffset = startTime - inputPosition;
         if(noteOffset > Plugin.MaxScheduleOffset)
         {
             // It's too early to schedule this
             return;
         }
 
-        int sampleRate = AudioSettings.GetSampleRate();
-        int mult = sampleRate / 1000;
-        ulong startSamples = (ulong)(startTime * mult);
-        ulong endSamples = (ulong)(endTime * mult);
+        ulong startSamples = TimeHelper.GetScheduleSamples(startTime);
+        ulong endSamples = TimeHelper.GetScheduleSamples(endTime);
 
         ScheduledHold newHold = FMODHelper.ScheduleHold(sfx, startSamples, endSamples);
         newHold.endTime = endTime;
@@ -185,7 +184,9 @@ public class SoundQueue<T>
         ScheduledSounds[id].Remove(note);
         if(PlayedSounds[id].ContainsKey(note))
         {
-            PlayedSounds[id][note].sound.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+            EventInstance sound = PlayedSounds[id][note].sound;
+            sound.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+            sound.release();
             PlayedSounds[id].Remove(note);
         }
     }
@@ -196,7 +197,9 @@ public class SoundQueue<T>
         ScheduledHolds.Remove(hold);
         if(PlayedHolds.ContainsKey(hold))
         {
-            PlayedHolds[hold].sound.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+            EventInstance sound = PlayedHolds[hold].sound;
+            sound.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+            sound.release();
             PlayedHolds.Remove(hold);
         }
     }
@@ -210,6 +213,7 @@ public class SoundQueue<T>
             foreach(KeyValuePair<T, ScheduledSound> pair in PlayedSounds[id])
             {
                 pair.Value.sound.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+                pair.Value.sound.release();
             }
             PlayedSounds[id].Clear();
         }
@@ -218,6 +222,7 @@ public class SoundQueue<T>
         foreach(KeyValuePair<T, ScheduledHold> pair in PlayedHolds)
         {
             pair.Value.sound.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+            pair.Value.sound.release();
         }
         PlayedHolds.Clear();
     }
